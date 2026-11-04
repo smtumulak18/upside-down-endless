@@ -1,0 +1,1292 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Slogan font: uses Benguiat if it is installed on this computer, otherwise tries the
+   file in public/fonts, otherwise falls back to Bebas Neue (see the h2 rule below). */
+@font-face {
+  font-family: 'Benguiat';
+  src: local('Benguiat Bold'), local('BenguiatBold'), local('Benguiat'),
+       url('/fonts/Benguiat_Bold.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Intro title font: installed copy first, then the file in public/fonts. */
+@font-face {
+  font-family: 'ST Outlined';
+  src: local('Stranger Things Outlined'), local('StrangerThingsOutlined'),
+       url('/fonts/Stranger_Things_Outlined.ttf') format('truetype');
+  font-weight: 400;
+  font-display: block;
+}
+
+/* Used by the intro's fade-out: the mask shrinks from the screen edges to the centre. */
+@property --iris {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 150%;
+}
+
+:root {
+  font-family: 'Inter', sans-serif;
+
+  /* Palette from the design spec */
+  --void: #050711;
+  --crimson: #ff294b;
+  --cyan: #54e9ff;
+  --green: #55e58b;
+  --white: #f3f5fc;
+  --muted: #a5b1c9;
+
+  --panel-bg: rgba(8, 12, 27, 0.84);
+  --panel-border: rgba(210, 225, 255, 0.22);
+  --panel-radius: 18px;
+
+  /* ---------- Board size ----------
+     The frame image is a little taller than the window, so its decorative top and
+     bottom ends bleed slightly off-screen. That gives the board the most room.
+     Block size is about 4.5% of the window height.
+     Change --frame-bleed to 1 to show the whole frame (smaller blocks). */
+  --vh: 100vh;
+  --vh: 100dvh;
+  --frame-bleed: 1.05;
+  --frame-aspect: 0.9584;                                   /* width / height of the frame image */
+  --frame-h: calc(var(--vh) * var(--frame-bleed));
+  --frame-w: calc(var(--frame-h) * var(--frame-aspect));
+
+  /* Width of the right-hand column (NEXT / HOLD / CONTROLS) */
+  --rcol-w: clamp(250px, min(24vw, 46vh), 400px);
+  --rcol-w: clamp(250px, min(24vw, 46dvh), 400px);
+
+  color: var(--white);
+  background: var(--void);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--void);
+}
+
+/* ---------- Background layers ---------- */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: -2%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(#080a1233, #080a1244),
+    url('/upside-down-bg.png') center 55% / cover no-repeat;
+  animation: storm-drift 35s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, #ff183b22, transparent 60%),
+    linear-gradient(90deg, #07091480, transparent 50%, #07091450),
+    linear-gradient(0deg, #07091499, transparent 35%);
+}
+
+@keyframes storm-drift {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to { transform: scale(1.07) translate3d(-1%, 1%, 0); }
+}
+
+#animated-background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--void);
+}
+
+#animated-background .background-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+
+/* ---------- Shell and three-column dashboard ---------- */
+
+.app-shell {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.dashboard {
+  height: 100%;
+  display: grid;
+  /* The centre column is narrower than the frame image on purpose:
+     only the thin outer tentacles hang over the neighbouring columns. */
+  grid-template-columns: minmax(0, 1fr) calc(var(--frame-w) * 0.78) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 0 clamp(16px, 2vw, 32px);
+}
+
+.col {
+  min-width: 0;
+}
+
+/* ---------- Left column ---------- */
+
+.col-left {
+  align-self: stretch;
+  justify-self: start;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(14px, 3.2dvh, 30px) 0;
+  container-type: inline-size; /* lets the slogan size itself to this column */
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  height: 46px;
+  width: auto;              /* keeps your logo's own proportions */
+  max-width: 140px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px #ff304066);   /* soft red glow; delete this line if you don't want it */
+}
+
+h1 {
+  margin: 0 0 4px;
+  font: 700 clamp(14px, 5cqw, 20px) 'Orbitron', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+h1 span {
+  color: var(--crimson);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--cyan);
+  font: 600 10px 'Orbitron', sans-serif;
+  letter-spacing: 1.7px;
+}
+
+.left-body {
+  margin-block: auto; /* centres slogan + stats in the space under the brand */
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 3dvh, 30px);
+}
+
+.hero-copy {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-copy::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -30px -45px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 45% 48%,
+    rgba(3, 5, 12, 0.85) 0%,
+    rgba(3, 5, 12, 0.65) 40%,
+    transparent 75%
+  );
+  filter: blur(22px);
+  pointer-events: none;
+}
+
+.hero-copy h2 {
+  margin: 10px 0 12px;
+  color: var(--crimson);
+  font: 400 clamp(26px, min(6.2dvh, 11.2cqw), 50px) / 1.06 'Benguiat', 'Benguiat Bold', 'Bebas Neue', Impact, 'Arial Narrow', serif;
+  font-synthesis: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-shadow: 0 0 28px #ff294b66, 0 2px 18px #000a;
+}
+
+.hero-copy h2 span {
+  color: var(--white);
+}
+
+.description {
+  max-width: 300px;
+  margin: 0;
+  color: #d2d8e8;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ---------- Panels (stats, controls) ---------- */
+
+.panel {
+  padding: 14px 16px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  box-shadow:
+    0 20px 60px #0006,
+    inset 0 1px #ffffff22,
+    0 0 30px #ff284d14;
+}
+
+.panel-title {
+  margin: 0 0 8px;
+  color: var(--crimson);
+  font: 700 18px 'Orbitron', sans-serif;
+  letter-spacing: 1.5px;
+}
+
+/* ---------- Stats ---------- */
+
+.stats {
+  display: grid;
+  padding: 4px 18px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: clamp(6px, 1.3dvh, 11px) 0;
+  border-bottom: 1px solid #ff294b44;
+}
+
+.stat:last-child {
+  border-bottom: 0;
+}
+
+.stat-label {
+  color: var(--crimson);
+  font: 600 11px 'Orbitron', sans-serif;
+  letter-spacing: 1.6px;
+}
+
+.stat-value {
+  color: var(--white);
+  font: 700 clamp(18px, 3dvh, 24px) 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-value.player {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: clamp(15px, 2.4dvh, 19px);
+}
+
+.stat-value.big {
+  font-size: clamp(22px, 4dvh, 32px);
+}
+
+.stat.pulse .stat-value {
+  display: inline-block;
+  transform-origin: left center;
+  animation: level-pulse 0.9s ease-out;
+}
+
+@keyframes level-pulse {
+  0% { text-shadow: 0 0 0 transparent; transform: scale(1); }
+  25% { text-shadow: 0 0 18px var(--cyan); transform: scale(1.25); }
+  100% { text-shadow: 0 0 0 transparent; transform: scale(1); }
+}
+
+/* ---------- Centre: the board in its frame ---------- */
+
+.col-center {
+  position: relative;
+  align-self: stretch;
+}
+
+.board-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--frame-w);
+  height: var(--frame-h);
+  transform: translate(-50%, -50%);
+  pointer-events: none; /* only the overlay buttons need clicks */
+}
+
+/* The opening in board_vein_frame.webp, measured from the image (exactly 1:2). */
+.board-window {
+  position: absolute;
+  z-index: 1;
+  left: 28.9489%;
+  top: 7.8818%;
+  width: 44.7164%;
+  height: 85.7143%;
+  background: #050a18;
+  box-shadow: 0 0 0 4px #050a18; /* tucks under the frame so no seam shows */
+}
+
+#game-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#game-container canvas {
+  display: block;
+}
+
+.frame-art {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- Overlay (pause / game over) ---------- */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  background: rgba(5, 7, 17, 0.84);
+  pointer-events: auto;
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.overlay h2 {
+  margin: 0;
+  font: 800 clamp(22px, 3.4dvh, 34px) 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-shadow: 0 0 20px #54e9ff66;
+}
+
+.overlay[data-tone='danger'] h2 {
+  color: var(--crimson);
+  text-shadow: 0 0 22px #ff294b88;
+}
+
+.overlay p {
+  margin: 0;
+  color: var(--white);
+  font: 500 12px/1.8 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  white-space: pre-line;
+}
+
+.overlay-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn {
+  min-width: 170px;
+  padding: 11px 18px;
+  color: var(--white);
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  font: 600 12px 'Orbitron', sans-serif;
+  letter-spacing: 1.4px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.btn:hover {
+  background: #ffffff14;
+  border-color: var(--cyan);
+}
+
+.btn.primary {
+  background: linear-gradient(145deg, #ff4055, #8a1632);
+  border-color: #ff9aa766;
+  box-shadow: 0 0 20px #ff294b44;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ---------- Right column ---------- */
+
+.col-right {
+  justify-self: end;
+  width: var(--rcol-w);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 1.2dvh, 12px);
+}
+
+/* NEXT and HOLD: the PNG art is the container; the pieces sit inside its dark screen. */
+.art-panel {
+  position: relative;
+  width: 100%;
+}
+
+.next-panel { aspect-ratio: 1.534; }
+.hold-panel { aspect-ratio: 1.663; }
+
+.panel-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The dark screen area inside each image, measured from the art. */
+.panel-screen {
+  position: absolute;
+  z-index: 1;
+}
+
+.next-panel .panel-screen {
+  left: 14.728%;
+  top: 33.388%;
+  width: 68.25%;
+  height: 51.8%;
+  padding: 2.5%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1.55fr 1fr;
+  gap: 3%;
+}
+
+.hold-panel .panel-screen {
+  left: 14.845%;
+  top: 33.016%;
+  width: 68.305%;
+  height: 55.079%;
+  display: grid;
+  place-items: center;
+}
+
+.slot {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+.slot-main {
+  grid-column: 1 / -1;
+  --mini: calc(var(--rcol-w) * 0.086);
+}
+
+.slot-sub {
+  --mini: calc(var(--rcol-w) * 0.051);
+}
+
+.hold-slot {
+  --mini: calc(var(--rcol-w) * 0.086);
+}
+
+.hold-slot.used {
+  opacity: 0.4; /* HOLD already used for this piece */
+}
+
+.mini {
+  position: relative;
+}
+
+.mini-cell {
+  position: absolute;
+  width: var(--mini);
+  height: var(--mini);
+  padding: 1px;
+  background-clip: content-box;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* ---------- Controls (kept the same style, made smaller) ---------- */
+
+.controls-panel {
+  padding: clamp(6px, 1.2dvh, 10px) 12px;
+}
+
+.controls-panel .panel-title {
+  margin-bottom: clamp(3px, 0.8dvh, 6px);
+  font-size: 12px;
+}
+
+.controls {
+  display: grid;
+  gap: clamp(1px, 0.35dvh, 3px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.controls li {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font: 500 11px 'Inter', sans-serif;
+}
+
+.keys {
+  display: flex;
+  gap: 3px;
+}
+
+kbd {
+  min-width: 22px;
+  padding: 2px 6px;
+  color: var(--cyan);
+  background: #54e9ff12;
+  border: 1px solid #54e9ff77;
+  border-radius: 6px;
+  font: 600 9px 'Orbitron', sans-serif;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+
+/* ---------- Intro (title sequence) ---------- */
+
+.intro {
+  --red: #ff3d22;
+  --glow: 0 0 5px #ff3d22, 0 0 18px #ff2a0f77, 0 0 40px #c4170a55;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 45%, #1b0705 0%, #000 68%);
+  color: var(--red);
+  user-select: none;
+}
+
+.intro-lockup {
+  --fs: var(--intro-fs, 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 88vw;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.intro-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Top row: bar - WELCOME TO - bar (where the show's logo has its double bar) */
+.intro-welcome-row {
+  gap: calc(var(--fs) * 0.2);
+  padding-inline: calc(var(--fs) * 0.05);
+  margin-bottom: calc(var(--fs) * 0.1);
+}
+
+.intro-welcome {
+  flex: 0 0 auto;
+  padding-left: 0.32em; /* balances the letter-spacing after the last letter */
+  font: 400 calc(var(--fs) * 0.25) / 1 'Benguiat', 'Benguiat Bold', 'Bebas Neue', Georgia, serif;
+  font-synthesis: none;
+  letter-spacing: 0.32em;
+  white-space: nowrap;
+  text-shadow: var(--glow);
+  opacity: 0;
+  will-change: opacity;
+}
+
+.intro-bar {
+  flex: 1 1 0;
+  height: max(10px, calc(var(--fs) * 0.075));
+  border: 2px solid var(--red);
+  border-radius: 1px;
+  box-shadow: 0 0 8px #ff3d22aa, 0 0 22px #ff2a0f66, inset 0 0 8px #ff3d2255;
+  opacity: 0;
+}
+
+/* Second line: bar - ENDLESS - bar (like THINGS in the logo) */
+.intro-line-2-row {
+  align-items: flex-start;
+  gap: calc(var(--fs) * 0.08);
+  padding-inline: calc(var(--fs) * 0.05);
+  margin-top: calc(var(--fs) * 0.035);
+}
+
+/* The bars sit near the top of the second line, like the lower bars in the show's logo. */
+.intro-line-2-row .intro-bar {
+  margin-top: calc(var(--fs) * 0.13);
+}
+
+.intro-line {
+  font: 400 var(--fs) / 0.88 'ST Outlined', 'Bebas Neue', Impact, sans-serif;
+  font-synthesis: none;
+  width: max-content;
+  white-space: nowrap;
+}
+
+.glyph {
+  display: inline-block;
+  opacity: 0;
+  text-shadow: var(--glow);
+  will-change: transform, opacity; /* each letter gets its own GPU layer, drawn once */
+}
+
+/* If the outlined font could not load, draw hollow outlined letters with CSS instead. */
+.no-outline-font .glyph {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--red);
+  text-shadow: none;
+  filter: drop-shadow(0 0 6px #ff3d22) drop-shadow(0 0 16px #ff2a0f88);
+}
+
+.intro-bloom {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 90vw;
+  height: 70vh;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 50, 20, 0.32), rgba(255, 50, 20, 0.1) 55%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.intro-gate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0 24px;
+  text-align: center;
+  font: 600 clamp(12px, 1.6vw, 18px) 'Orbitron', sans-serif;
+  letter-spacing: 0.32em;
+  color: var(--red);
+  text-shadow: var(--glow);
+  animation: gate-pulse 2.4s ease-in-out infinite;
+}
+
+.intro-gate[hidden] {
+  display: none;
+}
+
+@keyframes gate-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+/* Fade-out from the edges to the centre (see closeIris in intro.js). */
+.intro.closing {
+  -webkit-mask-image: radial-gradient(
+    ellipse farthest-corner at 50% 50%,
+    #000 calc(var(--iris) - 40%),
+    transparent var(--iris)
+  );
+  mask-image: radial-gradient(
+    ellipse farthest-corner at 50% 50%,
+    #000 calc(var(--iris) - 40%),
+    transparent var(--iris)
+  );
+}
+
+.intro-skip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4dvh;
+  margin: 0;
+  text-align: center;
+  font: 500 11px 'Inter', sans-serif;
+  letter-spacing: 0.3em;
+  color: var(--red);
+  opacity: 0;
+}
+
+/* ---------- Pre-game pop-up (enter your name, then PLAY GAME) ---------- */
+
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 700;            /* above the page, below the Settings button (800) and dialog (900) */
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  pointer-events: none;    /* only the card itself takes clicks */
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.menu-card {
+  width: min(440px, 100%);
+  padding: 36px 34px 32px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 41, 75, 0.18), transparent 65%),
+    #070b19f2;
+  border: 1px solid #ff294baa;
+  border-radius: 22px;
+  box-shadow: 0 0 50px #ff294b44, 0 24px 80px #000a, inset 0 0 28px #ff294b1f;
+  pointer-events: auto;
+  animation: menu-pop 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+
+.menu.closing .menu-card {
+  animation: menu-out 0.35s ease-in both;
+}
+
+@keyframes menu-pop {
+  from { opacity: 0; transform: translateY(16px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes menu-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: scale(0.94); }
+}
+
+.menu-step {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.menu-step[hidden] {
+  display: none;
+}
+
+.menu-kicker {
+  margin: 0;
+  color: var(--cyan);
+  font: 600 10px 'Orbitron', sans-serif;
+  letter-spacing: 0.28em;
+}
+
+.menu h2 {
+  margin: 0;
+  max-width: 100%;
+  color: var(--crimson);
+  font: 800 clamp(22px, 3.4dvh, 30px) / 1.15 'Orbitron', sans-serif;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 22px #ff294b88;
+  overflow-wrap: anywhere;
+}
+
+.menu .menu-welcome {
+  color: var(--white);
+  text-transform: uppercase;
+  text-shadow: 0 0 20px #54e9ff66;
+}
+
+.menu-text {
+  margin: 0;
+  color: var(--muted);
+  font: 500 12px / 1.9 'Orbitron', sans-serif;
+  letter-spacing: 0.14em;
+}
+
+.menu-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 13px 14px;
+  color: var(--white);
+  background: #0a1122;
+  border: 1px solid #54e9ff77;
+  border-radius: 10px;
+  font: 600 16px 'Orbitron', sans-serif;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.menu-input::placeholder {
+  color: #54e9ff55;
+}
+
+.menu-input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 18px #54e9ff55;
+}
+
+.menu-error {
+  margin: -6px 0 0;
+  color: var(--crimson);
+  font: 600 10px 'Orbitron', sans-serif;
+  letter-spacing: 0.18em;
+}
+
+.menu-error[hidden] {
+  display: none;
+}
+
+.menu .btn {
+  min-width: 220px;
+}
+
+/* ---------- Before the game starts: only the title and the pop-up show ---------- */
+/* The panels keep their space (so nothing jumps), they are just invisible. When the player
+   presses PLAY GAME the "pregame" class is removed and they fade + scale in one after the other. */
+
+.board-frame,
+.art-panel,
+.controls-panel,
+.stats {
+  transition:
+    opacity 0.9s ease,
+    scale 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.12);
+}
+
+.board-frame { transition-delay: 0s; }
+.stats { transition-delay: 0.12s; }
+.next-panel { transition-delay: 0.26s; }
+.hold-panel { transition-delay: 0.4s; }
+.controls-panel { transition-delay: 0.54s; }
+
+body.pregame .board-frame,
+body.pregame .art-panel,
+body.pregame .controls-panel,
+body.pregame .stats {
+  opacity: 0;
+  scale: 0.86;
+  visibility: hidden;
+  pointer-events: none;
+  /* going back to the menu (Quit): vanish quickly, all together */
+  transition:
+    opacity 0.35s ease,
+    scale 0.35s ease,
+    visibility 0s linear 0.35s;
+  transition-delay: 0s;
+}
+
+/* ---------- 3-2-1 countdown (inside the game panel) ---------- */
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  color: var(--white);
+  font: 800 clamp(80px, 17dvh, 170px) / 1 'Orbitron', sans-serif;
+  text-shadow: 0 0 30px #ff294bcc, 0 0 70px #ff294b88;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.countdown.tick {
+  animation: count-pop 1s ease-out both;
+}
+
+.countdown.go {
+  color: var(--cyan);
+  font-size: clamp(54px, 11dvh, 110px);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 30px #54e9ffcc, 0 0 70px #54e9ff88;
+  animation: count-go 0.8s ease-out both;
+}
+
+@keyframes count-pop {
+  0% { opacity: 0; transform: scale(1.9); }
+  18% { opacity: 1; transform: scale(1); }
+  70% { opacity: 1; transform: scale(0.96); }
+  100% { opacity: 0; transform: scale(0.7); }
+}
+
+@keyframes count-go {
+  0% { opacity: 0; transform: scale(0.6); }
+  25% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-frame,
+  .art-panel,
+  .controls-panel,
+  .stats {
+    transition: opacity 0.4s ease;
+    transition-delay: 0s;
+  }
+
+  body.pregame .board-frame,
+  body.pregame .art-panel,
+  body.pregame .controls-panel,
+  body.pregame .stats {
+    scale: 1;
+  }
+
+  .menu-card,
+  .menu.closing .menu-card {
+    animation: none;
+  }
+
+  .countdown.tick,
+  .countdown.go {
+    animation: count-fade 1s ease-out both;
+  }
+
+  @keyframes count-fade {
+    0%, 70% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+}
+
+/* ---------- Sound button ---------- */
+
+
+/* ---------- Narrow screens: stack and scroll ---------- */
+/* (There are no touch controls yet, so this is only for previewing the layout.) */
+@media (max-width: 1000px) {
+  :root {
+    --frame-h: min(calc((100vw - 24px) / 0.9584), 760px);
+    --rcol-w: min(92vw, 420px);
+  }
+
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .app-shell {
+    height: auto;
+    min-height: 100dvh;
+    padding: 16px 12px 40px;
+  }
+
+  .dashboard {
+    height: auto;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 24px;
+    padding: 0;
+  }
+
+  .col-center {
+    order: 1;
+    width: var(--frame-w);
+    height: var(--frame-h);
+    align-self: auto;
+  }
+
+  .col-right {
+    order: 2;
+    justify-self: center;
+  }
+
+  .col-left {
+    order: 3;
+    max-width: 480px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .stat.pulse .stat-value {
+    animation: none;
+  }
+
+  #animated-background .background-video {
+    transition: none;
+  }
+}
+
+/* ---------- Speed readout next to LEVEL ---------- */
+
+.stat-sub {
+  margin-left: 6px;
+  color: var(--cyan);
+  font: 600 9px 'Orbitron', sans-serif;
+  letter-spacing: 1.2px;
+  opacity: 0.9;
+}
+
+/* ---------- Toast (level up / big clears) ---------- */
+
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  z-index: 4;
+  transform: translate(-50%, 0);
+  padding: 10px 18px;
+  text-align: center;
+  white-space: pre-line;
+  font: 800 clamp(16px, 2.6dvh, 24px) / 1.25 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-shadow: 0 0 16px #54e9ffaa, 0 0 34px #54e9ff55;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toast[data-tone='hot'] {
+  color: #ff5a3c;
+  text-shadow: 0 0 16px #ff294bcc, 0 0 36px #ff294b66;
+}
+
+.toast.show {
+  animation: toast-pop 1.6s ease-out both;
+}
+
+@keyframes toast-pop {
+  0% { opacity: 0; transform: translate(-50%, 14px) scale(0.85); }
+  15% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+  30% { transform: translate(-50%, 0) scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -16px) scale(1); }
+}
+
+/* ---------- Settings button (top-right) ---------- */
+
+.settings-button {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 800;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--cyan);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.4s;
+}
+
+.settings-button[hidden] {
+  display: none;
+}
+
+.settings-button:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 16px #54e9ff55;
+  transform: rotate(45deg);
+}
+
+.settings-button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ---------- Settings dialog ---------- */
+
+.settings {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(3, 4, 10, 0.78);
+}
+
+.settings[hidden] {
+  display: none;
+}
+
+.settings-panel {
+  width: min(420px, 100%);
+  padding: 26px 28px 24px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 41, 75, 0.14), transparent 65%),
+    #080c1bf2;
+  border: 1px solid #ff294baa;
+  border-radius: 20px;
+  box-shadow: 0 0 40px #ff294b44, inset 0 0 24px #ff294b1f;
+}
+
+.settings-view[hidden] {
+  display: none;
+}
+
+.settings-view h2 {
+  margin: 0 0 20px;
+  color: var(--crimson);
+  font: 800 22px 'Orbitron', sans-serif;
+  letter-spacing: 3px;
+  text-shadow: 0 0 18px #ff294b77;
+}
+
+.slider-row {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.slider-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+
+.slider-label {
+  color: var(--cyan);
+  font: 600 11px 'Orbitron', sans-serif;
+  letter-spacing: 1.6px;
+}
+
+.slider-value {
+  color: var(--white);
+  font: 700 12px 'Orbitron', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  margin: 0;
+  background: linear-gradient(90deg, var(--crimson), #ff7a3c);
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--white);
+  border: 2px solid var(--crimson);
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ff294baa;
+}
+
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--white);
+  border: 2px solid var(--crimson);
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ff294baa;
+}
+
+.slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px #54e9ff99, 0 0 12px #ff294baa;
+}
+
+.slider:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px #54e9ff99, 0 0 12px #ff294baa;
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.settings-actions .btn {
+  flex: 1 1 100px;
+  min-width: 0;
+}
+
+.settings-text {
+  margin: 0 0 14px;
+  color: #d2d8e8;
+  font: 400 14px / 1.7 'Inter', sans-serif;
+}
+
+.settings-text strong {
+  color: var(--white);
+  font: 700 15px 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+}
+
+.settings-text.small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.btn.danger {
+  background: linear-gradient(145deg, #7d1224, #3d0a14);
+  border-color: #ff294b99;
+}
+
+.btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn[disabled]:hover {
+  background: transparent;
+  border-color: var(--panel-border);
+}
+
+/* The pause screen hides the board so you cannot plan your next move while paused. */
+.overlay[data-tone='pause'] {
+  background: rgba(5, 7, 17, 0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast.show {
+    animation: none;
+    opacity: 1;
+  }
+
+  .settings-button:hover {
+    transform: none;
+  }
+}

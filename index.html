@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050711" />
+    <meta
+      name="description"
+      content="UPSIDE DOWN: ENDLESS. A supernatural endless falling-block arcade game."
+    />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <title>UPSIDE DOWN: ENDLESS</title>
+    <link rel="stylesheet" href="/style.css" />
+    <noscript><style>.intro { display: none; }</style></noscript>
+  </head>
+
+  <body class="pregame">
+    <main class="app-shell">
+      <section class="dashboard">
+        <!-- LEFT: brand, slogan, stats -->
+        <aside class="col col-left">
+          <header class="brand">
+            <img class="brand-mark" src="/logo.png" alt="Upside Down: Endless logo" />
+            <div>
+              <h1>UPSIDE DOWN<span>: ENDLESS</span></h1>
+              <p class="eyebrow">AN ENDLESS ARCADE EXPERIENCE</p>
+            </div>
+          </header>
+
+          <div class="left-body">
+            <div class="hero-copy">
+              <p class="eyebrow">ANOTHER WORLD IS WAITING</p>
+              <h2>THE FALL<br />NEVER ENDS<span>.</span></h2>
+              <p class="description">
+                Enter the darkness. Find your rhythm. Survive the descent.
+              </p>
+            </div>
+
+            <section class="panel stats" aria-label="Run statistics">
+              <div class="stat">
+                <span class="stat-label">PLAYER</span>
+                <span class="stat-value player" id="stat-player">-</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">SCORE</span>
+                <span class="stat-value big" id="stat-score">000000</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">LINES</span>
+                <span class="stat-value" id="stat-lines">0</span>
+              </div>
+              <div class="stat" id="stat-level-box">
+                <span class="stat-label">LEVEL <span class="stat-sub" id="stat-speed">SPEED ×1.0</span></span>
+                <span class="stat-value" id="stat-level">1</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">TIME</span>
+                <span class="stat-value" id="stat-time">00:00</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">BEST</span>
+                <span class="stat-value" id="stat-best">000000</span>
+              </div>
+            </section>
+          </div>
+        </aside>
+
+        <!-- CENTER: the board, inside the vein frame -->
+        <section class="col col-center" aria-label="Game board">
+          <div class="board-frame">
+            <div class="board-window">
+              <div id="game-container"></div>
+
+              <div id="toast" class="toast" aria-live="polite"></div>
+              <div id="countdown" class="countdown" aria-live="assertive"></div>
+
+              <div id="overlay" class="overlay" hidden>
+                <h2 id="overlay-title"></h2>
+                <p id="overlay-detail"></p>
+                <div id="overlay-actions" class="overlay-actions"></div>
+              </div>
+            </div>
+
+            <img class="frame-art" src="/ui/board_vein_frame.webp" alt="" />
+          </div>
+        </section>
+
+        <!-- RIGHT: NEXT / HOLD / CONTROLS -->
+        <aside class="col col-right">
+          <section class="art-panel next-panel" aria-label="Next pieces">
+            <img class="panel-art" src="/ui/next_panel.webp" alt="" />
+            <div class="panel-screen">
+              <div class="slot slot-main" data-next="0"></div>
+              <div class="slot slot-sub" data-next="1"></div>
+              <div class="slot slot-sub" data-next="2"></div>
+            </div>
+          </section>
+
+          <section class="art-panel hold-panel" aria-label="Held piece">
+            <img class="panel-art" src="/ui/hold_panel.webp" alt="" />
+            <div class="panel-screen">
+              <div class="slot hold-slot empty" id="hold-slot"></div>
+            </div>
+          </section>
+
+          <section class="panel controls-panel">
+            <h3 class="panel-title">CONTROLS</h3>
+            <ul class="controls">
+              <li><span class="keys"><kbd>←</kbd><kbd>→</kbd></span><span>Move</span></li>
+              <li><span class="keys"><kbd>↓</kbd></span><span>Soft drop</span></li>
+              <li><span class="keys"><kbd>↑</kbd><kbd>X</kbd></span><span>Rotate</span></li>
+              <li><span class="keys"><kbd>Z</kbd></span><span>Reverse rotate</span></li>
+              <li><span class="keys"><kbd>SPACE</kbd></span><span>Hard drop</span></li>
+              <li><span class="keys"><kbd>SHIFT</kbd></span><span>Hold</span></li>
+              <li><span class="keys"><kbd>P</kbd><kbd>ESC</kbd></span><span>Pause</span></li>
+              <li><span class="keys"><kbd>R</kbd></span><span>Restart</span></li>
+            </ul>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <!-- Pop-up shown before the game starts (see menu.js): enter a name, then PLAY GAME -->
+    <div id="menu" class="menu" hidden>
+      <div class="menu-card" role="dialog" aria-label="Player setup">
+        <div id="menu-step-name" class="menu-step">
+          <p class="menu-kicker">PLAYER REGISTRATION</p>
+          <h2>ENTER YOUR NAME</h2>
+          <input
+            id="menu-name"
+            class="menu-input"
+            type="text"
+            maxlength="12"
+            placeholder="YOUR NAME"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="Player name"
+          />
+          <p id="menu-error" class="menu-error" hidden>PLEASE ENTER A NAME</p>
+          <button id="menu-continue" class="btn primary" type="button">CONTINUE</button>
+        </div>
+
+        <div id="menu-step-start" class="menu-step" hidden>
+          <p class="menu-kicker">WELCOME</p>
+          <h2 id="menu-welcome" class="menu-welcome"></h2>
+          <p class="menu-text">THE FALL NEVER ENDS.<br />ARE YOU READY?</p>
+          <button id="menu-start" class="btn primary" type="button">PLAY GAME</button>
+          <button id="menu-change" class="btn" type="button">CHANGE NAME</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings button: hidden during the intro, shown from the main menu on (see settings.js) -->
+    <button id="settings-button" class="settings-button" type="button" title="Settings" aria-label="Open settings" hidden>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.2" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+      </svg>
+    </button>
+
+    <div id="settings" class="settings" hidden>
+      <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <!-- Main view -->
+        <div id="settings-main" class="settings-view">
+          <h2 id="settings-title">SETTINGS</h2>
+
+          <label class="slider-row" for="sfx-slider">
+            <span class="slider-top"><span class="slider-label">SOUND EFFECTS</span><span class="slider-value" id="sfx-value">80%</span></span>
+            <input id="sfx-slider" class="slider" type="range" min="0" max="100" step="5" value="80" />
+          </label>
+
+          <label class="slider-row" for="music-slider">
+            <span class="slider-top"><span class="slider-label">MUSIC</span><span class="slider-value" id="music-value">70%</span></span>
+            <input id="music-slider" class="slider" type="range" min="0" max="100" step="5" value="70" />
+          </label>
+
+          <div class="settings-actions">
+            <button id="settings-about" class="btn" type="button">ABOUT</button>
+            <button id="settings-quit" class="btn" type="button">QUIT</button>
+            <button id="settings-close" class="btn primary" type="button">CLOSE</button>
+          </div>
+        </div>
+
+        <!-- About view -->
+        <div id="settings-about-view" class="settings-view" hidden>
+          <h2>ABOUT</h2>
+          <p class="settings-text"><strong>UPSIDE DOWN: ENDLESS</strong><br />An endless falling-block arcade game.</p>
+          <p class="settings-text">Clear lines to level up. Every level is faster: level 2 is twice as fast as level 1, level 5 is five times as fast, and it never stops.</p>
+          <p class="settings-text small">Built with Phaser 3 and Vite. Prototype version.<br />An unofficial fan-made project, not affiliated with or endorsed by the creators of the TV series that inspired it.</p>
+          <div class="settings-actions">
+            <button id="about-back" class="btn primary" type="button">BACK</button>
+          </div>
+        </div>
+
+        <!-- Quit confirmation view -->
+        <div id="settings-quit-view" class="settings-view" hidden>
+          <h2>QUIT?</h2>
+          <p class="settings-text">Leave this run and go back to the main menu?<br />Your current score will be lost.</p>
+          <div class="settings-actions">
+            <button id="quit-confirm" class="btn danger" type="button">QUIT</button>
+            <button id="quit-cancel" class="btn primary" type="button">CANCEL</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Title-sequence intro (see intro.js). Visible from the first moment so the game never flashes. -->
+    <div id="intro" class="intro" aria-hidden="true">
+      <div class="intro-bloom"></div>
+      <p class="intro-gate" id="intro-gate" hidden>CLICK OR PRESS ANY KEY TO ENTER</p>
+
+      <div class="intro-lockup">
+        <div class="intro-row intro-welcome-row">
+          <span class="intro-bar" data-side="left"></span>
+          <span class="intro-welcome" id="intro-welcome">WELCOME TO</span>
+          <span class="intro-bar" data-side="right"></span>
+        </div>
+
+        <div class="intro-line" id="intro-line-1"></div>
+
+        <div class="intro-row intro-line-2-row">
+          <span class="intro-bar" data-side="left"></span>
+          <div class="intro-line" id="intro-line-2"></div>
+          <span class="intro-bar" data-side="right"></span>
+        </div>
+      </div>
+
+      <p class="intro-skip">CLICK OR PRESS ANY KEY TO SKIP</p>
+    </div>
+
+    <script type="module" src="/game.js"></script>
+  </body>
+</html>

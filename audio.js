@@ -21,10 +21,10 @@ const MUSIC = {
 //   gain: loudness of this effect compared to the others
 //   cut:  a new play stops the previous one (stops fast key presses piling up into noise)
 const SFX = {
-  key: { src: '/audio/key_press.wav', rate: 1, gain: 1, cut: true },
-  shift: { src: '/audio/shift.mp3', rate: 1, gain: 1, cut: true },
-  lineClear: { src: '/audio/line_clear.wav', rate: 2, gain: 1, cut: false },
-  pause: { src: '/audio/pause.wav', rate: 1, gain: 1, cut: false }
+  key: { src: 'audio/key_press.wav', rate: 1, gain: 1, cut: true },
+  shift: { src: 'audio/shift.mp3', rate: 1, gain: 1, cut: true },
+  lineClear: { src: 'audio/line_clear.wav', rate: 2, gain: 1, cut: false },
+  pause: { src: 'audio/pause.wav', rate: 1, gain: 1, cut: false }
 };
 
 const VOLUME_KEY = 'upside-down-endless-volumes';

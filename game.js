@@ -45,13 +45,13 @@ const BEST_KEY = 'upside-down-endless-best';
 // To change a tile's artwork later, just point `file` at a different image.
 // `color` is used for the little pieces that fly off when a line is cleared.
 const TILES = {
-  I: { key: 'tile-walkie',   file: '/tiles/cyan_walkie_talkie.png',    color: 0x08c9ed },  // cyan
-  O: { key: 'tile-waffle',   file: '/tiles/eggo_waffle.png',           color: 0xffcf38 },  // golden yellow
-  T: { key: 'tile-cassette', file: '/tiles/max_music_cassette.png',    color: 0xc34cff },  // purple
-  S: { key: 'tile-cap',      file: '/tiles/green_trucker_cap.png',     color: 0x49e37e },  // green
-  Z: { key: 'tile-bat',      file: '/tiles/barbed_baseball_bat.png',   color: 0xff4b59 },  // crimson red
-  J: { key: 'tile-car',      file: '/tiles/vintage_blue_car.png',      color: 0x438cff },  // electric blue
-  L: { key: 'tile-ahoy',     file: '/tiles/ahoy_sailor_cap.png',       color: 0xff963a }   // orange
+  I: { key: 'tile-walkie',   file: 'tiles/cyan_walkie_talkie.png',    color: 0x08c9ed },  // cyan
+  O: { key: 'tile-waffle',   file: 'tiles/eggo_waffle.png',           color: 0xffcf38 },  // golden yellow
+  T: { key: 'tile-cassette', file: 'tiles/max_music_cassette.png',    color: 0xc34cff },  // purple
+  S: { key: 'tile-cap',      file: 'tiles/green_trucker_cap.png',     color: 0x49e37e },  // green
+  Z: { key: 'tile-bat',      file: 'tiles/barbed_baseball_bat.png',   color: 0xff4b59 },  // crimson red
+  J: { key: 'tile-car',      file: 'tiles/vintage_blue_car.png',      color: 0x438cff },  // electric blue
+  L: { key: 'tile-ahoy',     file: 'tiles/ahoy_sailor_cap.png',       color: 0xff963a }   // orange
 };
 
 // ---------- Personal best (saved in the browser) ----------

@@ -12,8 +12,8 @@
 
 // ---------- Music ----------
 const MUSIC = {
-  intro: { src: '/audio/intro.mp3', volume: 0.7 },   // volume = how loud this track is at 100% on the slider
-  game: { src: '/audio/Kids.mp3', volume: 0.55 }
+  intro: { src: 'audio/intro.mp3', volume: 0.7 },   // volume = how loud this track is at 100% on the slider
+  game: { src: 'audio/Kids.mp3', volume: 0.55 }
 };
 
 // ---------- Sound effects ----------

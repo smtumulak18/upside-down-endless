@@ -9,7 +9,7 @@ const videos = [];
 for (let i = 0; i < 2; i++) {
   const video = document.createElement('video');
 
-  video.src = '/upside-down-background-4k.mp4';
+  video.src = 'upside-down-background-4k.mp4';
   video.muted = true;
   video.playsInline = true;
   video.preload = 'auto';
